@@ -11,14 +11,13 @@ import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import payments.payment_processed;
 import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.logging.LoggerFactory;
 import uk.gov.companieshouse.payment_processed_consumer.PaymentProcessedConsumerApplication;
+
 
 
 @Configuration
@@ -44,12 +43,6 @@ public class KafkaConfig {
 
 
     @Bean
-    public KafkaTemplate<String, payment_processed>
-    kafkaTemplate(ProducerFactory<String, payment_processed> producerFactory) {
-        return new KafkaTemplate<>(producerFactory);
-    }
-
-    @Bean
     public ConcurrentKafkaListenerContainerFactory<String, payment_processed>
     kafkaListenerContainerFactory(ConsumerFactory<String, payment_processed> consumerFactory,
             @Value("${consumer.concurrency}") Integer concurrency) {
@@ -57,6 +50,7 @@ public class KafkaConfig {
         factory.setConsumerFactory(consumerFactory);
         factory.setConcurrency(concurrency);
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.RECORD);
+        factory.getContainerProperties().setMissingTopicsFatal(false);
         return factory;
     }
 

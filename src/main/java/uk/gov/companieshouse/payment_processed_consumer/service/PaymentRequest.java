@@ -20,18 +20,20 @@ public class PaymentRequest{
 
     }
 
-    public PaymentApi getPaymentResponse(String resourceId) throws ApiErrorResponseException {
+    public PaymentApi getPaymentSession(String resourceId){
         try {
             InternalApiClient client = apiClientServiceImpl.getPaymentsApiClient();
             PaymentGet paymentGet = client.payment().get("/payments/" + resourceId);
             return paymentGet.execute().getData();
-        } catch (URIValidationException e) {
+        } catch (ApiErrorResponseException | URIValidationException e) {
             throw new RuntimeException("Invalid URI for payment resource: " + resourceId, e);
         }
     }
 
 
-    public void updateTransaction(String transactionUri, PaymentPatchRequest paymentPatch){}
+    public void patchTransaction(String transactionUri, PaymentPatchRequest paymentPatch){
+
+    }
 
 //    public void updateTransaction(String transactionURI, PaymentPatchRequest patchRequest){
 //        try{
@@ -50,24 +52,4 @@ public class PaymentRequest{
 //    }
 
 }
-
-
-
-
-//    public PaymentResponse getPaymentResponse(String resourceId){
-//        String url = apiClientServiceImpl.getPaymentsApiUrl() + "/payments" + resourceId;
-//        try{
-//            HttpRequest request  = HttpRequest.newBuilder()
-//                    .uri(URI.create(url))
-//                    .header("Content-type", "application/json")
-//                    .header("Authorisation", "Bearer" + apiClientServiceImpl.getChsApiKey())
-//                    .GET()
-//                    .build();
-//
-//            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-//            return objectMapper.readValue(response.body(), PaymentResponse.class);
-//        }catch (Exception e){
-//            throw new RuntimeException("Error fetching payment details", e);
-//        }
-//    }
 

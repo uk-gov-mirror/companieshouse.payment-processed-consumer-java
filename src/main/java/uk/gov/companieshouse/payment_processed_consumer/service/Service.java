@@ -6,8 +6,8 @@ import uk.gov.companieshouse.payment_processed_consumer.model.PaymentPatchReques
 
 public interface Service {
 
-    public void processMessage(ServiceParameters parameters) throws ApiErrorResponseException;
-    public PaymentPatchRequest createTransactionPatchRequest(String refundId, String resourceId, PaymentApi
+    public void processMessage(ServiceParameters parameters);
+    public PaymentPatchRequest paymentPatchRequest(String refundId, String resourceId, PaymentApi
             paymentResponse);
 
 }

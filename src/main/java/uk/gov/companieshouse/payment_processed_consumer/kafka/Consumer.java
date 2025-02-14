@@ -4,11 +4,11 @@ package uk.gov.companieshouse.payment_processed_consumer.kafka;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.RetryableTopic;
 import org.springframework.kafka.retrytopic.DltStrategy;
+import org.springframework.kafka.retrytopic.SameIntervalTopicReuseStrategy;
 import org.springframework.messaging.Message;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Component;
 import payments.payment_processed;
-import uk.gov.companieshouse.api.error.ApiErrorResponseException;
 import uk.gov.companieshouse.payment_processed_consumer.exception.RetryableException;
 import uk.gov.companieshouse.payment_processed_consumer.service.Service;
 import uk.gov.companieshouse.payment_processed_consumer.service.ServiceParameters;
@@ -31,9 +31,10 @@ public class Consumer {
      * @param message A message containing a payload.
      */
     @KafkaListener(
+            id = "${payment.processed.group.name}",
             containerFactory = "kafkaListenerContainerFactory",
             topics = "${payment.processed.topic}",
-            autoStartup = "true"
+            groupId = "${payment.processed.group.name}"
     )
     @RetryableTopic(
             attempts = "${maximum.retry.attempts}",
@@ -41,14 +42,16 @@ public class Consumer {
             backoff = @Backoff(delayExpression = "${consumer.backoff_delay}"),
             dltTopicSuffix = "-error",
             dltStrategy = DltStrategy.FAIL_ON_ERROR,
+            sameIntervalTopicReuseStrategy = SameIntervalTopicReuseStrategy.SINGLE_TOPIC,
             include = RetryableException.class
     )
 
     public void consume(Message<payment_processed> message){
         try{
             service.processMessage(new ServiceParameters(message.getPayload()));
-        } catch (RetryableException | ApiErrorResponseException e){
+        } catch (RetryableException e){
             messageFlags.setRetryable(true);
+            throw e;
         }
     }
 

@@ -20,9 +20,9 @@ public class PaymentProcessorService implements Service {
         this.logger = logger;
     }
 
-    // Will determine whether payment is a refund or not, the transactionURI is amended if so.
+    // Processes the incoming message, and retrieves the payment information from payments API. Will also determine whether payment is a refund or not, the transactionURI is amended if so.
     @Override
-    public void processMessage(ServiceParameters parameters) throws ApiErrorResponseException {
+    public void processMessage(ServiceParameters parameters){
         final var message = parameters.getData();
         final var resourceId = message.getPaymentResourceId();
         final var refundId = message.getRefundId();
@@ -30,34 +30,35 @@ public class PaymentProcessorService implements Service {
 
         logger.info("Processing message " + message + " for resource ID " + resourceId + ".");
 
-        PaymentApi paymentResponse = paymentRequest.getPaymentResponse(resourceId);
-        String transactionURI = paymentResponse.getLinks().get("Resource");
+        PaymentApi paymentSession = paymentRequest.getPaymentSession(resourceId);
+        String transactionURI = paymentSession.getLinks().get("Resource");
         if (!refundId.isEmpty()) {
             transactionURI += "/refunds";
         }
-        PaymentPatchRequest patchRequest = createTransactionPatchRequest(refundId, resourceId, paymentResponse);
-        paymentRequest.updateTransaction(transactionURI, patchRequest);
+        PaymentPatchRequest patchRequest = paymentPatchRequest(refundId, resourceId, paymentSession);
+        paymentRequest.patchTransaction(transactionURI, patchRequest);
     }
 
-    // Builds the PatchRequest to send to updateTransaction
+    // Builds the PatchRequest to send to the transaction API
     @Override
-    public PaymentPatchRequest createTransactionPatchRequest(String refundId, String resourceId, PaymentApi paymentResponse) {
-        PaymentPatchRequest patchRequest = new PaymentPatchRequest();
+    public PaymentPatchRequest paymentPatchRequest(String refundId, String resourceId, PaymentApi paymentSession) {
+        PaymentPatchRequest paymentPatchRequest = new PaymentPatchRequest();
         if (!refundId.isEmpty()) {
-            paymentResponse.getRefunds().stream()
+            paymentSession.getRefunds().stream()
                     .filter(refund -> refund.getId().equals(refundId))
                     .findFirst()
                     .ifPresent(refund -> {
-                        patchRequest.setRefundReference(refund.getId());
-                        patchRequest.setRefundStatus(String.valueOf(refund.getStatus()));
-                        patchRequest.setRefundProcessedAt(
+                        paymentPatchRequest.setRefundReference(refund.getId());
+                        paymentPatchRequest.setRefundStatus(String.valueOf(refund.getStatus()));
+                        paymentPatchRequest.setRefundProcessedAt(
                                 LocalDateTime.parse(refund.getCreatedAt()));
                     });
         } else {
-            patchRequest.setStatus(paymentResponse.getStatus());
-            patchRequest.setPaymentReference(resourceId);
-            patchRequest.setPaidAt(LocalDateTime.parse(paymentResponse.getCompletedAt()));
+            paymentPatchRequest.setStatus(paymentSession.getStatus());
+            paymentPatchRequest.setPaymentReference(resourceId);
+            paymentPatchRequest.setPaidAt(LocalDateTime.parse(paymentSession.getCompletedAt()));
         }
-        return patchRequest;
+        logger.info("Sending PATCH request for resourceId: " + resourceId);
+        return paymentPatchRequest;
     }
 }
