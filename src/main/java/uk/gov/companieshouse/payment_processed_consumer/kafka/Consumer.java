@@ -10,6 +10,7 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Component;
 import payments.payment_processed;
 import uk.gov.companieshouse.payment_processed_consumer.exception.RetryableException;
+import uk.gov.companieshouse.payment_processed_consumer.service.PaymentProcessorService;
 import uk.gov.companieshouse.payment_processed_consumer.service.Service;
 import uk.gov.companieshouse.payment_processed_consumer.service.ServiceParameters;
 
@@ -17,10 +18,10 @@ import uk.gov.companieshouse.payment_processed_consumer.service.ServiceParameter
 @Component
 public class Consumer {
 
-    private final Service service;
+    private final PaymentProcessorService service;
     private final MessageFlags messageFlags;
 
-    public Consumer(Service service, MessageFlags messageFlags) {
+    public Consumer(PaymentProcessorService service, MessageFlags messageFlags) {
         this.service = service;
         this.messageFlags = messageFlags;
     }
@@ -50,7 +51,6 @@ public class Consumer {
         try{
             service.processMessage(new ServiceParameters(message.getPayload()));
         } catch (RetryableException e){
-            messageFlags.setRetryable(true);
             throw e;
         }
     }

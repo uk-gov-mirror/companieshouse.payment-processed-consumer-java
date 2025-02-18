@@ -1,10 +1,8 @@
-uk/gov/companieshouse/payment_processed_consumer/model/PaymentLinks.class
 uk/gov/companieshouse/payment_processed_consumer/exception/RetryableException.class
 uk/gov/companieshouse/payment_processed_consumer/kafka/InvalidMessageRouter.class
 uk/gov/companieshouse/payment_processed_consumer/exception/NonRetryableException.class
-uk/gov/companieshouse/payment_processed_consumer/service/PaymentRequest.class
 uk/gov/companieshouse/payment_processed_consumer/kafka/Consumer.class
-uk/gov/companieshouse/payment_processed_consumer/model/PaymentPatchRequest.class
+uk/gov/companieshouse/payment_processed_consumer/service/PaymentSessionService.class
 uk/gov/companieshouse/payment_processed_consumer/apiclient/ApiClientServiceImpl.class
 uk/gov/companieshouse/payment_processed_consumer/environment/EnvironmentVariablesChecker$RequiredEnvironmentVariables.class
 uk/gov/companieshouse/payment_processed_consumer/service/ServiceParameters.class
@@ -12,10 +10,10 @@ uk/gov/companieshouse/payment_processed_consumer/kafka/MessageLoggingAspect.clas
 uk/gov/companieshouse/payment_processed_consumer/service/PaymentProcessorService.class
 uk/gov/companieshouse/payment_processed_consumer/apiclient/IApiClientService.class
 uk/gov/companieshouse/payment_processed_consumer/environment/EnvironmentVariablesChecker.class
+uk/gov/companieshouse/payment_processed_consumer/service/PaymentPatchService.class
 uk/gov/companieshouse/payment_processed_consumer/logging/LoggingUtils.class
 uk/gov/companieshouse/payment_processed_consumer/config/KafkaConfig.class
 uk/gov/companieshouse/payment_processed_consumer/logging/LoggingUtilsConfiguration.class
-uk/gov/companieshouse/payment_processed_consumer/model/Refund.class
 uk/gov/companieshouse/payment_processed_consumer/service/Service.class
 uk/gov/companieshouse/payment_processed_consumer/kafka/MessageFlags.class
 uk/gov/companieshouse/payment_processed_consumer/PaymentProcessedConsumerApplication.class

@@ -2,21 +2,21 @@ package uk.gov.companieshouse.payment_processed_consumer.service;
 
 import java.time.LocalDateTime;
 import org.springframework.stereotype.Component;
-import uk.gov.companieshouse.api.error.ApiErrorResponseException;
 import uk.gov.companieshouse.api.model.payment.PaymentApi;
 import uk.gov.companieshouse.logging.Logger;
-import uk.gov.companieshouse.payment_processed_consumer.model.PaymentPatchRequest;
-
 
 
 @Component
 public class PaymentProcessorService implements Service {
 
-    private final PaymentRequest paymentRequest;
+    private final PaymentSessionService paymentSessionService;
+    private final PaymentPatchService paymentPatchService;
     private final Logger logger;
 
-    public PaymentProcessorService(PaymentRequest paymentRequest, Logger logger) {
-        this.paymentRequest = paymentRequest;
+    public PaymentProcessorService(PaymentSessionService paymentSessionService,
+            PaymentPatchService paymentPatchService, Logger logger) {
+        this.paymentSessionService = paymentSessionService;
+        this.paymentPatchService = paymentPatchService;
         this.logger = logger;
     }
 
@@ -27,36 +27,36 @@ public class PaymentProcessorService implements Service {
         final var resourceId = message.getPaymentResourceId();
         final var refundId = message.getRefundId();
 
-
         logger.info("Processing message " + message + " for resource ID " + resourceId + ".");
 
-        PaymentApi paymentSession = paymentRequest.getPaymentSession(resourceId);
+        PaymentApi paymentSession = paymentSessionService.getPaymentSession(resourceId);
         String transactionURI = paymentSession.getLinks().get("Resource");
         if (!refundId.isEmpty()) {
             transactionURI += "/refunds";
         }
-        PaymentPatchRequest patchRequest = paymentPatchRequest(refundId, resourceId, paymentSession);
-        paymentRequest.patchTransaction(transactionURI, patchRequest);
+        PaymentApi patchRequest = paymentPatchRequest(refundId, resourceId, paymentSession);
+        paymentPatchService.patchTransaction(transactionURI, patchRequest);
     }
 
     // Builds the PatchRequest to send to the transaction API
     @Override
-    public PaymentPatchRequest paymentPatchRequest(String refundId, String resourceId, PaymentApi paymentSession) {
-        PaymentPatchRequest paymentPatchRequest = new PaymentPatchRequest();
+    public PaymentApi paymentPatchRequest(String refundId, String resourceId, PaymentApi paymentSession) {
+        PaymentApi paymentPatchRequest = new PaymentApi();
         if (!refundId.isEmpty()) {
             paymentSession.getRefunds().stream()
                     .filter(refund -> refund.getId().equals(refundId))
                     .findFirst()
                     .ifPresent(refund -> {
-                        paymentPatchRequest.setRefundReference(refund.getId());
-                        paymentPatchRequest.setRefundStatus(String.valueOf(refund.getStatus()));
-                        paymentPatchRequest.setRefundProcessedAt(
-                                LocalDateTime.parse(refund.getCreatedAt()));
+                        paymentPatchRequest.setReference(refund.getId());
+                        paymentPatchRequest.setStatus(String.valueOf(refund.getStatus()));
+                        paymentPatchRequest.setCreatedAt(
+                                String.valueOf(LocalDateTime.parse(refund.getCreatedAt())));
                     });
         } else {
             paymentPatchRequest.setStatus(paymentSession.getStatus());
-            paymentPatchRequest.setPaymentReference(resourceId);
-            paymentPatchRequest.setPaidAt(LocalDateTime.parse(paymentSession.getCompletedAt()));
+            paymentPatchRequest.setReference(resourceId);
+            paymentPatchRequest.setCreatedAt(
+                    String.valueOf(LocalDateTime.parse(paymentSession.getCompletedAt())));
         }
         logger.info("Sending PATCH request for resourceId: " + resourceId);
         return paymentPatchRequest;

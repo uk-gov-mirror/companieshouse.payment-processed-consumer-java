@@ -11,10 +11,8 @@
 /Users/jhalladey/Documents/Developer/payment-processed-consumer-java/src/main/java/uk/gov/companieshouse/payment_processed_consumer/kafka/MessageLoggingAspect.java
 /Users/jhalladey/Documents/Developer/payment-processed-consumer-java/src/main/java/uk/gov/companieshouse/payment_processed_consumer/logging/LoggingUtils.java
 /Users/jhalladey/Documents/Developer/payment-processed-consumer-java/src/main/java/uk/gov/companieshouse/payment_processed_consumer/logging/LoggingUtilsConfiguration.java
-/Users/jhalladey/Documents/Developer/payment-processed-consumer-java/src/main/java/uk/gov/companieshouse/payment_processed_consumer/model/PaymentLinks.java
-/Users/jhalladey/Documents/Developer/payment-processed-consumer-java/src/main/java/uk/gov/companieshouse/payment_processed_consumer/model/PaymentPatchRequest.java
-/Users/jhalladey/Documents/Developer/payment-processed-consumer-java/src/main/java/uk/gov/companieshouse/payment_processed_consumer/model/Refund.java
+/Users/jhalladey/Documents/Developer/payment-processed-consumer-java/src/main/java/uk/gov/companieshouse/payment_processed_consumer/service/PaymentPatchService.java
 /Users/jhalladey/Documents/Developer/payment-processed-consumer-java/src/main/java/uk/gov/companieshouse/payment_processed_consumer/service/PaymentProcessorService.java
-/Users/jhalladey/Documents/Developer/payment-processed-consumer-java/src/main/java/uk/gov/companieshouse/payment_processed_consumer/service/PaymentRequest.java
+/Users/jhalladey/Documents/Developer/payment-processed-consumer-java/src/main/java/uk/gov/companieshouse/payment_processed_consumer/service/PaymentSessionService.java
 /Users/jhalladey/Documents/Developer/payment-processed-consumer-java/src/main/java/uk/gov/companieshouse/payment_processed_consumer/service/Service.java
 /Users/jhalladey/Documents/Developer/payment-processed-consumer-java/src/main/java/uk/gov/companieshouse/payment_processed_consumer/service/ServiceParameters.java
