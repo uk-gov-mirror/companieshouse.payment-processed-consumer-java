@@ -58,7 +58,7 @@ locals {
   ]
 
   # secrets to go in list
-  task_secrets = concat(local.service_secret_list,local.global_secret_list,[])
+  task_secrets = concat(local.service_secret_list,local.global_secret_list)
 
   task_environment = concat(local.ssm_global_version_map,local.ssm_service_version_map,[
     { "name" : "PORT", "value" : local.container_port }
